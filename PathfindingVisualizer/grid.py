@@ -55,26 +55,28 @@ class Grid:
 
     def add_start_node(self, x, y) -> None:
         selected_node = self.get_node(x, y)
-        if selected_node is None:
+        if selected_node is None or selected_node is self.end_node:
             return
         if selected_node is self.start_node:
             selected_node.make_unvisited()
             self.start_node = None
             return
+        if self.start_node is not None:
+            self.start_node.make_unvisited()
 
-        self.start_node.make_unvisited()
         selected_node.make_start_node()
         self.start_node = selected_node
 
     def add_end_node(self, x, y):
         selected_node = self.get_node(x, y)
-        if selected_node is None:
+        if selected_node is None or selected_node is self.start_node:
             return
         if selected_node is self.end_node:
             selected_node.make_unvisited()
-            self.start_node = None
-
-        self.end_node.make_unvisited()
+            self.end_node = None
+            return
+        if self.end_node is not None:
+            self.end_node.make_unvisited()
         selected_node.make_end_node()
         self.end_node = selected_node
 

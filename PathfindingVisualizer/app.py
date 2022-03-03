@@ -32,8 +32,8 @@ class App(ABC):
 
 
 class PathFindingApp(App):
-    MENU_HEIGHT: int = 50
-    CELL_SIZE: int = 25
+    MENU_HEIGHT: int = 40
+    CELL_SIZE: int = 20
 
     def __init__(self, height: str, width: str, title: str, background: str,
                  path_algorithms: dict, maze_algorithms: dict):
@@ -51,6 +51,21 @@ class PathFindingApp(App):
     def on_generate_maze_button_click(self):
         print("generate_button")
 
+    def on_lef_button_click(self, event):
+        x, y = event.x, event.y
+        self.grid.add_obstacle(x, y)
+        self.drawer.draw_grid(self.grid.nodes)
+
+    def on_right_button_click(self, event):
+        x, y = event.x, event.y
+        self.grid.add_start_node(x, y)
+        self.drawer.draw_grid(self.grid.nodes)
+
+    def on_middle_button_click(self, event):
+        x, y = event.x, event.y
+        self.grid.add_end_node(x, y)
+        self.drawer.draw_grid(self.grid.nodes)
+
     def add_ui(self) -> None:
         path_algorithms_names = list(self.path_algorithms.keys())
         maze_algorithms_names = list(self.maze_algorithms.keys())
@@ -63,6 +78,10 @@ class PathFindingApp(App):
         grid_canvas.place(x=0, y=50)
         self.drawer = NodeDrawer(grid_canvas, self.CELL_SIZE, self.window)
         self.drawer.draw_grid(self.grid.nodes)
+
+        self.window.bind('<ButtonPress-1>', self.on_lef_button_click)
+        self.window.bind('<ButtonPress-2>', self.on_middle_button_click)
+        self.window.bind('<ButtonPress-3>', self.on_right_button_click)
 
     def update(self) -> None:
         self.window.mainloop()
