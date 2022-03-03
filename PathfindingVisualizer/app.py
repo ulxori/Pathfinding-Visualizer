@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 from tkinter import Tk
 from menu import Menu
+from node_drawer import NodeDrawer
 
 
 class App(ABC):
@@ -31,6 +32,7 @@ class App(ABC):
 
 class PathFindingApp(App):
     MENU_HEIGHT: int = 50
+    CELL_SIZE: int = 5
 
     def __init__(self, height: str, width: str, title: str, background: str,
                  path_algorithms: dict, maze_algorithms: dict):

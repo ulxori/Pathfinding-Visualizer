@@ -18,8 +18,8 @@ class Menu:
         self.drop_path.pack(padx=self.PADDING, pady=self.PADDING, side=LEFT, anchor=NW)
         self.drop_maze.pack(padx=self.PADDING, pady=self.PADDING, side=LEFT, anchor=NW)
 
-    def add_button(self, text, func):
-        Button(self.window, text=text, command=func).pack(padx=5, pady=5, side=LEFT, anchor=NW)
+    def add_button(self, text: str, func) -> None:
+        Button(self.window, text=text, command=func).pack(padx=self.PADDING, pady=self.PADDING, side=LEFT, anchor=NW)
 
     def get_selected_path_algorithm_key(self) -> str:
         return self.clicked_path_algorithm.get()

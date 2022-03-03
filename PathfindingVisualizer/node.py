@@ -10,7 +10,7 @@ class Node:
         self.neighbors = []
 
     def get_position(self) -> tuple[int, int]:
-        return self.row_num, self.col_num
+        return self.col_num, self.row_num
 
     def set_neighbors(self, neighbors: List['Node']) -> None:
         self.neighbors = neighbors
