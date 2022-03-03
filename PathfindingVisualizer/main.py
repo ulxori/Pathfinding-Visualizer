@@ -5,8 +5,8 @@ WIDTH = "720"
 HEIGHT = "480"
 TITLE = "Pathfinding-Visualizer"
 BACKGROUND_COLOR = Color.Brown.value
-PATH_ALGORITHMS = {}
-MAZE_ALGORITHMS = {}
+PATH_ALGORITHMS = {'A*': 'A*'}
+MAZE_ALGORITHMS = {'Recursive Division': 'Recursive Division'}
 
 
 def main():
