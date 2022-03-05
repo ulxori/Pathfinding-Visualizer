@@ -37,6 +37,8 @@ class Grid:
 
     def reset_grid(self) -> None:
         [[node.make_unvisited() for node in row] for row in self.nodes]
+        self.start_node = None
+        self.end_node = None
 
     def remove_solution(self) -> None:
         visited = NodeStatus.Visited.value

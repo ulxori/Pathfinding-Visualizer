@@ -29,3 +29,6 @@ class Node:
 
     def make_end_node(self) -> None:
         self.status = NodeStatus.EndNode.value
+
+    def make_path_node(self) -> None:
+        self.status = NodeStatus.PathNode.value

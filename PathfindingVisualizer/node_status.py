@@ -3,8 +3,8 @@ from enum import Enum
 
 class NodeStatus(Enum):
     Unvisited = '#ffffff'
-    Visited = '#0000ff'
+    Visited = '#ff00ff'
     Obstacle = '#000000'
     StartNode = '#00ff00'
-    EndNode = '#ff00ff'
-    Path = '#0f0f0f'
+    EndNode = '#ffff00'
+    PathNode = '#0000ff'

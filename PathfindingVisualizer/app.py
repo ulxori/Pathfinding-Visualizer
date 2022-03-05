@@ -5,7 +5,7 @@ from menu import Menu
 from node_drawer import NodeDrawer
 from grid import Grid
 
-
+from path_algorithms import Bfs, Dfs
 class App(ABC):
     def __init__(self, height: str, width: str, title: str, background: str):
         self.height: str = height
@@ -47,9 +47,12 @@ class PathFindingApp(App):
 
     def on_solve_maze_button_click(self):
         print("solve_button")
+        visited, path = Dfs().solve(self.grid)
+        self.drawer.draw_solution(visited, path)
 
     def on_generate_maze_button_click(self):
         print("generate_button")
+
 
     def on_lef_button_click(self, event):
         x, y = event.x, event.y
@@ -62,6 +65,7 @@ class PathFindingApp(App):
         self.drawer.draw_grid(self.grid.nodes)
 
     def on_middle_button_click(self, event):
+        print('inside')
         x, y = event.x, event.y
         self.grid.add_end_node(x, y)
         self.drawer.draw_grid(self.grid.nodes)
