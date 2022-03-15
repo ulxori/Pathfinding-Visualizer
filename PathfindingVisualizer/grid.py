@@ -42,7 +42,7 @@ class Grid:
 
     def remove_solution(self) -> None:
         visited = NodeStatus.Visited.value
-        path = NodeStatus.Solution.value
+        path = NodeStatus.PathNode.value
         to_remove = [visited, path]
         nodes_to_remove = list([filter(lambda node: node.status in to_remove, row) for row in self.nodes])
         [[node.make_unvisited() for node in row]for row in nodes_to_remove]
@@ -56,7 +56,7 @@ class Grid:
         return is_x_pos_within and is_y_pos_within
 
     def add_start_node(self, x, y) -> None:
-        selected_node = self.get_node(x, y)
+        selected_node = self.get_node_from_position(x, y)
         if selected_node is None or selected_node is self.end_node:
             return
         if selected_node is self.start_node:
@@ -70,7 +70,7 @@ class Grid:
         self.start_node = selected_node
 
     def add_end_node(self, x, y):
-        selected_node = self.get_node(x, y)
+        selected_node = self.get_node_from_position(x, y)
         if selected_node is None or selected_node is self.start_node:
             return
         if selected_node is self.end_node:
@@ -83,7 +83,7 @@ class Grid:
         self.end_node = selected_node
 
     def add_obstacle(self, x, y):
-        selected_node = self.get_node(x, y)
+        selected_node = self.get_node_from_position(x, y)
         is_end_node = selected_node is self.end_node
         is_start_node = selected_node is self.start_node
 
@@ -95,7 +95,10 @@ class Grid:
 
         selected_node.make_obstacle()
 
-    def get_node(self, x, y):
+    def get_node(self, x_index: int, y_index: int):
+        return self.nodes[y_index][x_index]
+
+    def get_node_from_position(self, x, y):
         if not self.is_position_within(x, y):
             return None
         x_index = floor((x / self.width) * self.cols_num)

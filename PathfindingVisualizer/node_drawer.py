@@ -1,3 +1,4 @@
+import time
 from tkinter import Tk
 from node import Node
 from typing import List, Optional
@@ -15,21 +16,28 @@ class NodeDrawer:
         self.window: Tk = window
 
     def draw_solution(self, visited: List[Node], path: List[Node]):
-        delay = self.INITIAL_DELAY
+        delay: int = self.INITIAL_DELAY
         for node in visited:
             node.make_visited()
             if node in path:
                 self.window.after(delay, self.draw, node, True, NodeStatus.PathNode.value)
             else:
                 self.window.after(delay, self.draw, node)
-            delay = delay + self.INITIAL_DELAY
+            delay += self.INITIAL_DELAY
 
         for node in path:
             self.window.after(delay, self.draw, node)
-            delay = delay + self.INITIAL_DELAY
+            delay += self.INITIAL_DELAY
 
-    def draw_grid(self, nodes: List[List[Node]]):
+    def draw_grid(self, nodes: List[List[Node]]) -> None:
         [[self.draw(node) for node in row]for row in nodes]
+
+    def draw_maze(self, maze: List[Node]) -> None:
+        delay: int = self.INITIAL_DELAY
+        for node in maze:
+            node.make_obstacle()
+            self.window.after(delay, self.draw, node)
+            delay += self.INITIAL_DELAY
 
     def draw(self, node: Node, change_node_status: bool = False, status: Optional[str] = None):
         x, y = node.get_position()
@@ -44,3 +52,4 @@ class NodeDrawer:
         self.rects[(x, y)] = rect
         if change_node_status:
             node.status = status
+

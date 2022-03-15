@@ -1,11 +1,9 @@
-import time
 from abc import ABC, abstractmethod
 from node import Node
-from node_drawer import NodeDrawer
-from typing import List
 from grid import Grid
 from node_status import NodeStatus
 from typing import List
+
 
 class PathFindingAlgorithm(ABC):
     @abstractmethod
@@ -34,7 +32,7 @@ class Bfs(PathFindingAlgorithm):
 
         visited.remove(grid.start_node)
         visited.remove(grid.end_node)
-        path: Node = []
+        path: List[Node] = []
 
         if grid.end_node in previous_node:
             prev_node = previous_node[grid.end_node]
@@ -52,21 +50,22 @@ class Dfs(PathFindingAlgorithm):
         path: List[Node] = []
 
         def helper(current_node: Node, is_found: bool) -> bool:
-            if current_node is grid.end_node:
-                return True
             for neighbor in current_node.neighbors:
                 obstacle: bool = neighbor.status == NodeStatus.Obstacle.value
                 if neighbor not in visited and not obstacle:
+                    if neighbor is grid.end_node:
+                        return True
                     path.append(neighbor)
                     visited.append(neighbor)
                     is_found = helper(neighbor, is_found)
                 if is_found:
                     return True
-            path.pop()
+            if len(path) != 0:
+                path.pop()
             return False
 
         helper(grid.start_node, False)
-        visited.remove(grid.end_node)
+        visited.remove(grid.start_node)
 
         return visited, path
 

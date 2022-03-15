@@ -4,8 +4,10 @@ from tkinter import Tk, Canvas
 from menu import Menu
 from node_drawer import NodeDrawer
 from grid import Grid
-
+from maze_algorithms import RecursionDivision, MidPointCircle, RecursionDivisionVerticalSkew
 from path_algorithms import Bfs, Dfs
+
+
 class App(ABC):
     def __init__(self, height: str, width: str, title: str, background: str):
         self.height: str = height
@@ -46,12 +48,18 @@ class PathFindingApp(App):
         self.drawer: NodeDrawer = None
 
     def on_solve_maze_button_click(self):
-        print("solve_button")
-        visited, path = Dfs().solve(self.grid)
-        self.drawer.draw_solution(visited, path)
+        if self.grid.is_valid():
+            self.grid.remove_solution()
+            self.drawer.draw_grid(self.grid.nodes)
+            print("solve_button")
+            visited, path = Dfs().solve(self.grid)
+            self.drawer.draw_solution(visited, path)
 
     def on_generate_maze_button_click(self):
-        print("generate_button")
+        self.grid.reset_grid()
+        self.drawer.draw_grid(self.grid.nodes)
+        obstacles = MidPointCircle().generate(self.grid)
+        self.drawer.draw_maze(obstacles)
 
 
     def on_lef_button_click(self, event):
@@ -83,9 +91,9 @@ class PathFindingApp(App):
         self.drawer = NodeDrawer(grid_canvas, self.CELL_SIZE, self.window)
         self.drawer.draw_grid(self.grid.nodes)
 
-        self.window.bind('<ButtonPress-1>', self.on_lef_button_click)
-        self.window.bind('<ButtonPress-2>', self.on_middle_button_click)
-        self.window.bind('<ButtonPress-3>', self.on_right_button_click)
+        grid_canvas.bind('<ButtonPress-1>', self.on_lef_button_click)
+        grid_canvas.bind('<ButtonPress-2>', self.on_middle_button_click)
+        grid_canvas.bind('<ButtonPress-3>', self.on_right_button_click)
 
     def update(self) -> None:
         self.window.mainloop()
