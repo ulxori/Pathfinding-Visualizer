@@ -4,7 +4,7 @@ from grid import Grid
 from node_status import NodeStatus
 from typing import List
 from queue import PriorityQueue
-from math import sqrt
+from helper import calculate_manhattan_distance, restore_path
 
 INF: int = 999999999
 
@@ -92,7 +92,7 @@ class AStar(PathFindingAlgorithm):
         while not open.empty():
             current_node = open.get()[2]
             in_open.remove(current_node)
-            if current_node == grid.end_node:
+            if current_node is grid.end_node:
                 break
 
             for neighbor in current_node.neighbors:
@@ -128,12 +128,37 @@ class AStar(PathFindingAlgorithm):
         return calculate_manhattan_distance(*begin_node.get_position(), *end_node.get_position())
 
 
-def calculate_manhattan_distance(x1: int, y1: int, x2: int, y2: int) -> int:
-    return abs(x1 - x2) + abs(y1-y2)
+class BestFirstSearch(PathFindingAlgorithm):
+    def solve(self, grid: Grid) -> tuple[List[Node], List[Node]]:
+        visited: List[Node] = [grid.start_node]
+        path: List[Node] = []
+        previous_node: dict[Node, Node] = {}
+        counter: int = 0
+        pq: PriorityQueue = PriorityQueue()
+        pq.put((0, counter, grid.start_node))
+        while not pq.empty():
+            current_node = pq.get()[2]
+            if current_node is grid.end_node:
+                break
+
+            for neighbor in current_node.neighbors:
+                obstacle: bool = neighbor.status == NodeStatus.Obstacle.value
+                if neighbor not in visited and not obstacle:
+                    counter += 1
+                    visited.append(neighbor)
+                    pq.put((self.calculate_heuristic(neighbor, grid.end_node), counter, neighbor))
+                    previous_node[neighbor] = current_node
+
+        visited.remove(grid.start_node)
+        visited.remove(grid.end_node)
+        path = restore_path(previous_node, grid.end_node, grid.start_node)
+        return visited, path
+
+    def calculate_heuristic(self, start_node: Node, end_node: Node):
+        return calculate_manhattan_distance(*start_node.get_position(), *end_node.get_position())
 
 
-def calculate_euclidean_distance(x1: int, x2: int, y1: int, y2: int) -> int:
-    return sqrt((x2 - x1)**2 + (y2 - y1)**2)
+
 
 
 
