@@ -4,9 +4,8 @@ from grid import Grid
 from node_status import NodeStatus
 from typing import List
 from queue import PriorityQueue
-from helper import calculate_manhattan_distance, restore_path
+from helper import calculate_manhattan_distance, restore_path, INF
 
-INF: int = 999999999
 
 class PathFindingAlgorithm(ABC):
     @abstractmethod
@@ -158,10 +157,32 @@ class BestFirstSearch(PathFindingAlgorithm):
         return calculate_manhattan_distance(*start_node.get_position(), *end_node.get_position())
 
 
+class Dijkstra(PathFindingAlgorithm):
+    def solve(self, grid: Grid) -> tuple[List[Node], List[Node]]:
+        visited: List[Node] = []
+        path: List[Node] = []
+        previous_node: dict[Node, Node] = {}
+        unvisited = {node: INF for row in grid.nodes for node in row if node.status != NodeStatus.Obstacle.value}
+        unvisited[grid.start_node] = 0
 
+        while unvisited:
+            current_node = min(unvisited, key=unvisited.get)
+            tmp_distance = unvisited[current_node]
+            if current_node is grid.end_node or tmp_distance == INF:
+                break
 
+            visited.append(current_node)
+            for neighbor in current_node.neighbors:
+                obstacle: bool = neighbor.status == NodeStatus.Obstacle.value
+                if neighbor not in visited and not obstacle:
+                    new_distance = unvisited[current_node] + 1
+                    old_distance = unvisited[neighbor]
+                    if new_distance < old_distance:
+                        unvisited[neighbor] = new_distance
+                        previous_node[neighbor] = current_node
 
+            unvisited.pop(current_node)
 
-
-
-
+        visited.remove(grid.start_node)
+        path = restore_path(previous_node, grid.end_node, grid.start_node)
+        return visited, path
