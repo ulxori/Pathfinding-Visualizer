@@ -5,7 +5,7 @@ from menu import Menu
 from node_drawer import NodeDrawer
 from grid import Grid
 from maze_algorithms import RecursionDivision, MidPointCircle, RecursionDivisionVerticalSkew
-from path_algorithms import Bfs, Dfs
+from path_algorithms import Bfs, Dfs, AStar
 
 
 class App(ABC):
@@ -52,7 +52,7 @@ class PathFindingApp(App):
             self.grid.remove_solution()
             self.drawer.draw_grid(self.grid.nodes)
             print("solve_button")
-            visited, path = Dfs().solve(self.grid)
+            visited, path = AStar().solve(self.grid)
             self.drawer.draw_solution(visited, path)
 
     def on_generate_maze_button_click(self):

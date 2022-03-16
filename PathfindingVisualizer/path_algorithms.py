@@ -3,7 +3,10 @@ from node import Node
 from grid import Grid
 from node_status import NodeStatus
 from typing import List
+from queue import PriorityQueue
+from math import sqrt
 
+INF: int = 999999999
 
 class PathFindingAlgorithm(ABC):
     @abstractmethod
@@ -72,7 +75,65 @@ class Dfs(PathFindingAlgorithm):
 
 class AStar(PathFindingAlgorithm):
     def solve(self, grid: Grid) -> tuple[List[Node], List[Node]]:
-        pass
+        visited: List[Node] = [grid.start_node]
+        path: List[Node] = []
+        open: PriorityQueue = PriorityQueue()
+        in_open = {grid.start_node}
+        counter = 0
+        previous_node: dict = {}
+        g_score: dict[Node, int] = {node: INF for row in grid.nodes for node in row}
+        f_score: dict[Node, int] = {node: INF for row in grid.nodes for node in row}
+
+        g_score[grid.start_node] = 0
+        f_score[grid.start_node] = self.calculate_heuristic(grid.start_node, grid.end_node)
+
+        open.put((f_score[grid.start_node], counter, grid.start_node))
+
+        while not open.empty():
+            current_node = open.get()[2]
+            in_open.remove(current_node)
+            if current_node == grid.end_node:
+                break
+
+            for neighbor in current_node.neighbors:
+                obstacle: bool = neighbor.status == NodeStatus.Obstacle.value
+                if not obstacle:
+
+                    tmp_g_score = g_score[current_node] + 1
+                    if tmp_g_score < g_score[neighbor]:
+                        g_score[neighbor] = tmp_g_score
+                        tmp_f_score = tmp_g_score + self.calculate_heuristic(neighbor, grid.end_node)
+                        f_score[neighbor] = tmp_f_score
+                        if neighbor not in in_open:
+                            counter += 1
+                            open.put((tmp_f_score, counter, neighbor))
+                            previous_node[neighbor] = current_node
+                            in_open.add(neighbor)
+                            visited.append(neighbor)
+
+        visited.remove(grid.start_node)
+        visited.remove(grid.end_node)
+
+        if grid.end_node in previous_node:
+            prev_node = previous_node[grid.end_node]
+            while prev_node is not grid.start_node:
+                path.append(prev_node)
+                prev_node = previous_node[prev_node]
+
+        return visited, path
+
+    #@abstractmethod
+    def calculate_heuristic(self, begin_node: Node, end_node: Node) -> int:
+        #pass
+        return calculate_manhattan_distance(*begin_node.get_position(), *end_node.get_position())
+
+
+def calculate_manhattan_distance(x1: int, y1: int, x2: int, y2: int) -> int:
+    return abs(x1 - x2) + abs(y1-y2)
+
+
+def calculate_euclidean_distance(x1: int, x2: int, y1: int, y2: int) -> int:
+    return sqrt((x2 - x1)**2 + (y2 - y1)**2)
 
 
 
