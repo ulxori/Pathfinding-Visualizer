@@ -17,7 +17,7 @@ class MazeAlgorithm(ABC):
         pass
 
 
-class RecursionDivision(MazeAlgorithm):
+class RecursiveDivision(MazeAlgorithm):
     def generate(self, grid: Grid) -> List[Node]:
         rows_num: int = grid.rows_num
         cols_num: int = grid.cols_num
@@ -85,7 +85,7 @@ class RecursionDivision(MazeAlgorithm):
             random.choice([Direction.vertical, Direction.horizontal])
 
 
-class RecursionDivisionVerticalSkew(RecursionDivision):
+class RecursiveDivisionVerticalSkew(RecursiveDivision):
     def get_direction(self, width: int, height: int) -> Direction:
         directions = [Direction.vertical, Direction.horizontal]
         directions_weights = (1, 4)
@@ -93,7 +93,7 @@ class RecursionDivisionVerticalSkew(RecursionDivision):
         return selected
 
 
-class RecursionDivisionHorizontalSkew(RecursionDivision):
+class RecursiveDivisionHorizontalSkew(RecursiveDivision):
     def get_direction(self, width: int, height: int) -> Direction:
         directions = [Direction.vertical, Direction.horizontal]
         directions_weights = (4, 1)
@@ -170,4 +170,14 @@ class MidPointCircle(MazeAlgorithm):
         return points
 
 
+class MazeAlgorithmFactory:
+
+    def get_maze_algorithm(self, algorithm: str = "Recursion division"):
+        algorithms = {
+            "Recursive division": RecursiveDivision,
+            "Recursive division vertical skew": RecursiveDivisionVerticalSkew,
+            "Recursive division horizontal skew": RecursiveDivisionHorizontalSkew,
+            "Midpoint": MidPointCircle
+        }
+        return algorithms[algorithm]
 

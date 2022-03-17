@@ -4,7 +4,8 @@ from grid import Grid
 from node_status import NodeStatus
 from typing import List
 from queue import PriorityQueue
-from helper import calculate_manhattan_distance, restore_path, INF
+from helper import calculate_manhattan_distance, calculate_euclidean_distance, calculate_chebyshev_distance,\
+    restore_path, INF
 
 
 class PathFindingAlgorithm(ABC):
@@ -26,14 +27,16 @@ class Bfs(PathFindingAlgorithm):
             if current_node is grid.end_node:
                 break
             for neighbor in current_node.neighbors:
-                obstacle: bool = neighbor.status == NodeStatus.Obstacle.value
+                obstacle: bool = neighbor.status is NodeStatus.Obstacle
                 if neighbor not in visited and not obstacle:
                     queue.append(neighbor)
                     previous_node[neighbor] = current_node
                     visited.append(neighbor)
 
         visited.remove(grid.start_node)
-        visited.remove(grid.end_node)
+        if grid.end_node in visited:
+            visited.remove(grid.end_node)
+
         path: List[Node] = []
 
         if grid.end_node in previous_node:
@@ -53,7 +56,7 @@ class Dfs(PathFindingAlgorithm):
 
         def helper(current_node: Node, is_found: bool) -> bool:
             for neighbor in current_node.neighbors:
-                obstacle: bool = neighbor.status == NodeStatus.Obstacle.value
+                obstacle: bool = neighbor.status is NodeStatus.Obstacle
                 if neighbor not in visited and not obstacle:
                     if neighbor is grid.end_node:
                         return True
@@ -95,7 +98,7 @@ class AStar(PathFindingAlgorithm):
                 break
 
             for neighbor in current_node.neighbors:
-                obstacle: bool = neighbor.status == NodeStatus.Obstacle.value
+                obstacle: bool = neighbor.status is NodeStatus.Obstacle
                 if not obstacle:
 
                     tmp_g_score = g_score[current_node] + 1
@@ -111,7 +114,9 @@ class AStar(PathFindingAlgorithm):
                             visited.append(neighbor)
 
         visited.remove(grid.start_node)
-        visited.remove(grid.end_node)
+
+        if grid.end_node in visited:
+            visited.remove(grid.end_node)
 
         if grid.end_node in previous_node:
             prev_node = previous_node[grid.end_node]
@@ -121,10 +126,24 @@ class AStar(PathFindingAlgorithm):
 
         return visited, path
 
-    #@abstractmethod
-    def calculate_heuristic(self, begin_node: Node, end_node: Node) -> int:
-        #pass
-        return calculate_manhattan_distance(*begin_node.get_position(), *end_node.get_position())
+    @abstractmethod
+    def calculate_heuristic(self, start_node: Node, end_node: Node) -> int:
+        pass
+
+
+class AStarManhattan(AStar):
+    def calculate_heuristic(self, start_node: Node, end_node: Node) -> int:
+        return calculate_manhattan_distance(*start_node.get_position(), *end_node.get_position())
+
+
+class AStarEuclidean(AStar):
+    def calculate_heuristic(self, start_node: Node, end_node: Node) -> int:
+        return calculate_euclidean_distance(*start_node.get_position(), *end_node.get_position())
+
+
+class AStarChebyshev(AStar):
+    def calculate_heuristic(self, start_node: Node, end_node: Node) -> int:
+        return calculate_chebyshev_distance(*start_node.get_position(), *end_node.get_position())
 
 
 class BestFirstSearch(PathFindingAlgorithm):
@@ -141,7 +160,7 @@ class BestFirstSearch(PathFindingAlgorithm):
                 break
 
             for neighbor in current_node.neighbors:
-                obstacle: bool = neighbor.status == NodeStatus.Obstacle.value
+                obstacle: bool = neighbor.status is NodeStatus.Obstacle
                 if neighbor not in visited and not obstacle:
                     counter += 1
                     visited.append(neighbor)
@@ -149,12 +168,30 @@ class BestFirstSearch(PathFindingAlgorithm):
                     previous_node[neighbor] = current_node
 
         visited.remove(grid.start_node)
-        visited.remove(grid.end_node)
+
+        if grid.end_node in visited:
+            visited.remove(grid.end_node)
         path = restore_path(previous_node, grid.end_node, grid.start_node)
         return visited, path
 
-    def calculate_heuristic(self, start_node: Node, end_node: Node):
+    @abstractmethod
+    def calculate_heuristic(self, start_node: Node, end_node: Node) -> int:
+        pass
+
+
+class BestFirstSearchManhattan(BestFirstSearch):
+    def calculate_heuristic(self, start_node: Node, end_node: Node) -> int:
         return calculate_manhattan_distance(*start_node.get_position(), *end_node.get_position())
+
+
+class BestFirstSearchEuclidean(BestFirstSearch):
+    def calculate_heuristic(self, start_node: Node, end_node: Node) -> int:
+        return calculate_euclidean_distance(*start_node.get_position(), *end_node.get_position())
+
+
+class BestFirstSearchChebyshev(BestFirstSearch):
+    def calculate_heuristic(self, start_node: Node, end_node: Node) -> int:
+        return calculate_chebyshev_distance(*start_node.get_position(), *end_node.get_position())
 
 
 class Dijkstra(PathFindingAlgorithm):
@@ -162,7 +199,7 @@ class Dijkstra(PathFindingAlgorithm):
         visited: List[Node] = []
         path: List[Node] = []
         previous_node: dict[Node, Node] = {}
-        unvisited = {node: INF for row in grid.nodes for node in row if node.status != NodeStatus.Obstacle.value}
+        unvisited = {node: INF for row in grid.nodes for node in row if node.status is not NodeStatus.Obstacle}
         unvisited[grid.start_node] = 0
 
         while unvisited:
@@ -173,7 +210,7 @@ class Dijkstra(PathFindingAlgorithm):
 
             visited.append(current_node)
             for neighbor in current_node.neighbors:
-                obstacle: bool = neighbor.status == NodeStatus.Obstacle.value
+                obstacle: bool = neighbor.status is NodeStatus.Obstacle
                 if neighbor not in visited and not obstacle:
                     new_distance = unvisited[current_node] + 1
                     old_distance = unvisited[neighbor]
@@ -186,3 +223,20 @@ class Dijkstra(PathFindingAlgorithm):
         visited.remove(grid.start_node)
         path = restore_path(previous_node, grid.end_node, grid.start_node)
         return visited, path
+
+
+class PathAlgorithmFactory:
+
+    def get_path_algorithm(self, algorithm_name: str = "Bfs"):
+        path_algorithms = {
+            "Bfs": Bfs,
+            "Dfs": Dfs,
+            "Dijkstra": Dijkstra,
+            "A star manhattan distance": AStarManhattan,
+            "A star euclidean distance": AStarEuclidean,
+            "A star chebyshev distance": AStarChebyshev,
+            "Best first search manhattan distance": BestFirstSearchManhattan,
+            "Best first search euclidean distance": BestFirstSearchEuclidean,
+            "Best first search chebyshev distance": BestFirstSearchChebyshev
+        }
+        return path_algorithms[algorithm_name]

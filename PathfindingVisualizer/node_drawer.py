@@ -20,7 +20,7 @@ class NodeDrawer:
         for node in visited:
             node.make_visited()
             if node in path:
-                self.window.after(delay, self.draw, node, True, NodeStatus.PathNode.value)
+                self.window.after(delay, self.draw, node, True, NodeStatus.PathNode)
             else:
                 self.window.after(delay, self.draw, node)
             delay += self.INITIAL_DELAY
@@ -39,9 +39,9 @@ class NodeDrawer:
             self.window.after(delay, self.draw, node)
             delay += self.INITIAL_DELAY
 
-    def draw(self, node: Node, change_node_status: bool = False, status: Optional[str] = None):
+    def draw(self, node: Node, change_node_status: bool = False, status: Optional[NodeStatus] = None):
         x, y = node.get_position()
-        color: str = node.status
+        color: str = node.status.value
         if (x, y) in self.rects:
             old_rect = self.rects[(x, y)]
             self.canvas.delete(old_rect)

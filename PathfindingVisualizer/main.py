@@ -1,12 +1,15 @@
 from app import PathFindingApp
 from colors import Color
 
-WIDTH = "720"
-HEIGHT = "480"
-TITLE = "Pathfinding-Visualizer"
-BACKGROUND_COLOR = Color.Brown.value
-PATH_ALGORITHMS = {'A*': 'A*'}
-MAZE_ALGORITHMS = {'Recursive Division': 'Recursive Division'}
+WIDTH: str = "720"
+HEIGHT: str = "480"
+TITLE: str = "Pathfinding-Visualizer"
+BACKGROUND_COLOR: str = Color.Brown.value
+PATH_ALGORITHMS: list[str] = ["Bfs", "Dfs", "Dijkstra", "A star manhattan distance", "A star euclidean distance",
+                              "A star chebyshev distance", "Best first search manhattan distance",
+                              "Best first search euclidean distance", "Best first search chebyshev distance"]
+MAZE_ALGORITHMS: list[str] = ["Recursive division", "Recursive division vertical skew",
+                              "Recursive division horizontal skew", "Midpoint"]
 
 
 def main():

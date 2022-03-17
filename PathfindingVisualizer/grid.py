@@ -1,6 +1,6 @@
 from math import floor
 from node import Node
-from typing import Optional
+from typing import Optional, List
 from node_status import NodeStatus
 
 
@@ -18,7 +18,7 @@ class Grid:
 
     def add_neighbors(self, node: Node) -> None:
         x, y = node.get_position()
-        neighbors = []
+        neighbors: List[Node] = []
         is_left_available = x - 1 >= 0
         is_right_available = x + 1 < self.cols_num
         is_up_available = y - 1 >= 0
@@ -41,8 +41,8 @@ class Grid:
         self.end_node = None
 
     def remove_solution(self) -> None:
-        visited = NodeStatus.Visited.value
-        path = NodeStatus.PathNode.value
+        visited = NodeStatus.Visited
+        path = NodeStatus.PathNode
         to_remove = [visited, path]
         nodes_to_remove = list([filter(lambda node: node.status in to_remove, row) for row in self.nodes])
         [[node.make_unvisited() for node in row]for row in nodes_to_remove]
@@ -50,13 +50,13 @@ class Grid:
     def is_valid(self) -> bool:
         return self.start_node is not None and self.end_node is not None
 
-    def is_position_within(self, x, y) -> bool:
-        is_x_pos_within: bool = 0 <= x <= self.width
-        is_y_pos_within: bool = 0 <= y <= self.height
+    def is_position_within(self, x: int, y: int) -> bool:
+        is_x_pos_within: bool = 0 <= x < self.width
+        is_y_pos_within: bool = 0 <= y < self.height
         return is_x_pos_within and is_y_pos_within
 
-    def add_start_node(self, x, y) -> None:
-        selected_node = self.get_node_from_position(x, y)
+    def add_start_node(self, x: int, y: int) -> None:
+        selected_node = self.get_node_from_cords(x, y)
         if selected_node is None or selected_node is self.end_node:
             return
         if selected_node is self.start_node:
@@ -69,8 +69,8 @@ class Grid:
         selected_node.make_start_node()
         self.start_node = selected_node
 
-    def add_end_node(self, x, y):
-        selected_node = self.get_node_from_position(x, y)
+    def add_end_node(self, x: int, y: int) -> None:
+        selected_node = self.get_node_from_cords(x, y)
         if selected_node is None or selected_node is self.start_node:
             return
         if selected_node is self.end_node:
@@ -82,23 +82,21 @@ class Grid:
         selected_node.make_end_node()
         self.end_node = selected_node
 
-    def add_obstacle(self, x, y):
-        selected_node = self.get_node_from_position(x, y)
+    def add_obstacle(self, x: int, y: int) -> Node:
+        selected_node = self.get_node_from_cords(x, y)
         is_end_node = selected_node is self.end_node
         is_start_node = selected_node is self.start_node
 
         if selected_node is None or is_start_node or is_end_node:
-            return
-        if selected_node.status == NodeStatus.Obstacle.value:
-            selected_node.make_unvisited()
-            return
+            return None
 
         selected_node.make_obstacle()
+        return selected_node
 
-    def get_node(self, x_index: int, y_index: int):
+    def get_node(self, x_index: int, y_index: int) -> Node:
         return self.nodes[y_index][x_index]
 
-    def get_node_from_position(self, x, y):
+    def get_node_from_cords(self, x: int, y: int) -> Optional[Node]:
         if not self.is_position_within(x, y):
             return None
         x_index = floor((x / self.width) * self.cols_num)
